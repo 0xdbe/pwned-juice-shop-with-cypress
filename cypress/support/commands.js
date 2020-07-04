@@ -53,21 +53,28 @@ Cypress.Commands.add("signin", (email, password) => {
     
     cy.visit('http://localhost:3000/#/login').then(() => {
         
-      // SQL Injection
+      // Complete login form
       cy.get('#email').type(email);
       cy.get('#password').type(password);
       cy.get('#loginButton').click();
       
-      // Attendre le temps nécessaire pour que la web app set le cookie token
+      // Waiting for token cookie (that will be set by front end)
       cy.wait(2000);
+      
+      // Check if token cookie exist
+      cy.getCookie('token').should('exist');
+     
+      // Setting token alias
+      cy.getCookie('token').then((cookie) => {
+        cy.wrap(cookie.value).as('token');
+      });
+      
     });
-    
     
 });
 
 Cypress.Commands.add('isSolvedChallenge', ( challengeKey ) => {
-    
-  cy.request('GET', '/api/Challenges/?key=scoreBoardChallenge')
+  cy.request('GET', `/api/Challenges/?key=${challengeKey}`)
     .then((resp) => {
       return resp.body.data[0].solved;
   })
