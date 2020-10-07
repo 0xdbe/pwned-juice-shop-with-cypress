@@ -43,15 +43,17 @@ export function christmasSpecialChallenge() {
         cy.get('#checkoutButton').click();
             
         //Select firt delivery address
-        cy.get('#mat-radio-39 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle').click({ force: true });
+        cy.get('.mat-radio-outer-circle').click({ multiple: true, force: true });
+        //cy.get('#mat-radio-39 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle').click({ force: true });
         cy.get('.btn-next').click();
             
         // Select the firt delivery mode
-        cy.get('#mat-radio-41 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle').click({ force: true });
+        //cy.get('#mat-radio-41 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle').click({ force: true });
+        cy.get('.mat-radio-outer-circle').click({ multiple: true, force: true });
         cy.get('.nextButton').click();
             
         // Select the first credit card
-        cy.get('.mat-radio-outer-circle').click({ force: true });
+        cy.get('.mat-radio-outer-circle').click({ multiple: true, force: true });
         cy.get('.nextButton').click();
             
         // Confirm checkout
